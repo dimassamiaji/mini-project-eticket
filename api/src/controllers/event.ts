@@ -88,11 +88,11 @@ export const eventController = {
       const editEvent: Prisma.eventsUpdateInput = {
         event_name,
         image_url: req.file?.filename,
-        price,
+        price: Number(price),
         description,
-        start_date,
-        end_date,
-        availability,
+        start_date: new Date(start_date),
+        end_date: new Date(end_date),
+        availability: Number(availability),
         address,
         price_type,
         category: {
@@ -106,16 +106,26 @@ export const eventController = {
           },
         },
       };
+      await prisma.$transaction(async (prisma) => {
+        const checkImage = await prisma.events.findUnique({
+          where: {
+            id: Number(req.params.id),
+          },
+        });
+        const fs = require("fs");
+        fs.unlinkSync(
+          __dirname + "/../public/images/event_images/" + checkImage?.image_url
+        );
+        if (req.file) {
+          editEvent.image_url = req.file.filename;
+        }
 
-      if (req.file) {
-        editEvent.image_url = req.file.filename;
-      }
-
-      await prisma.events.update({
-        data: editEvent,
-        where: {
-          id: Number(req.params.id),
-        },
+        await prisma.events.update({
+          data: editEvent,
+          where: {
+            id: Number(req.params.id),
+          },
+        });
       });
       res.send({
         success: true,

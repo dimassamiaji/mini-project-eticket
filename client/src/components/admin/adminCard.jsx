@@ -9,15 +9,14 @@ function AdminEventCard(props) {
         <img
           src={process.env.API_URL + props.image_url}
           alt=""
-          className=" w-24 object-cover"
+          className=" w-24 object-cover max-h-[70px]"
         />
       </td>
-
       <td className="text-left">{props.event_name}</td>
       <td className=" font-semibold">
         IDR {Number(props.price).toLocaleString("id-ID")}
       </td>
-      <td className="flex gap-5 justify-center items-center h-[70px]">
+      <td className="flex gap-5 justify-center items-center h-[70px] my-auto">
         <ModalEventEditComponent {...props} />
         <button
           className="h-[30px] border w-[72px] rounded-md text-white bg-black hover:bg-white border-black hover:text-black"

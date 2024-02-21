@@ -77,6 +77,15 @@ function ModalEventEditComponent(props) {
     form.append("category_id", document.getElementById("category_id").value);
     form.append("location_id", document.getElementById("location_id").value);
     form.append("price_type", document.getElementById("price_type").value);
+
+    axiosInstance()
+      .patch("/events/" + formik.values.id, form)
+      .then(() => {
+        onClose();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
   const [categories, setCategories] = useState([]);
   const [locations, setLocations] = useState([]);
@@ -97,16 +106,14 @@ function ModalEventEditComponent(props) {
       })
       .catch((err) => console.log(err));
   };
+  const renderFile = (e) => {
+    formik.setFieldValue("image", e.target.files[0]);
+  };
   useEffect(() => {
     fetchCategories();
     fetchLocations();
     edit();
   }, []);
-
-  useEffect(() => {
-    console.log(formik.values);
-    console.log(new Date(formik.values.start_date));
-  }, [formik.values]);
   return (
     <>
       <button
@@ -285,26 +292,19 @@ function ModalEventEditComponent(props) {
                     </tbody>
                   </table>
                 </div>
+                <div className="flex mt-6 items-center justify-center">
+                  <button
+                    className="bg-black text-white p-1 px-2 rounded-md w-24 "
+                    type="submit"
+                    onClick={() => save()}
+                  >
+                    submit
+                  </button>
+                </div>
               </form>
             </div>
           </ModalBody>
-
-          <ModalFooter>
-            <div className="flex gap-2">
-              <button
-                className="bg-black text-white p-1 px-2 rounded-md w-24 "
-                type="submit"
-              >
-                submit
-              </button>
-              <button
-                className="bg-black text-white p-1 px-2 rounded-md w-24 "
-                onClick={() => formik.resetForm()}
-              >
-                clear
-              </button>
-            </div>
-          </ModalFooter>
+          <ModalFooter></ModalFooter>
         </ModalContent>
       </Modal>
     </>

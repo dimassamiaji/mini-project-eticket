@@ -44,16 +44,6 @@ function Page() {
     },
   });
 
-  const edit = async (id) => {
-    const res = await axiosInstance().get("/events/" + id);
-    const event = res.data.result;
-    formik.setFieldValue("id", event.id);
-    formik.setFieldValue("event_name", event.event_name);
-    formik.setFieldValue("image_url", event.image_url);
-    formik.setFieldValue("price", event.price);
-    formik.setFieldValue("description", event.description);
-  };
-
   const save = () => {
     const form = new FormData();
     form.append("event_name", formik.values.event_name);
@@ -69,25 +59,14 @@ function Page() {
     form.append("location_id", document.getElementById("location_id").value);
     form.append("price_type", document.getElementById("price_type").value);
 
-    if (formik.values.id) {
-      axiosInstance()
-        .patch("/events/" + formik.values.id, form)
-        .then(() => {
-          fetchEvents();
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    } else {
-      axiosInstance()
-        .post("/events/", form)
-        .then(() => {
-          fetchEvents();
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
+    axiosInstance()
+      .post("/events/", form)
+      .then(() => {
+        fetchEvents();
+      })
+      .catch((err) => {
+        console.log(err);
+      });
     formik.resetForm();
   };
 
