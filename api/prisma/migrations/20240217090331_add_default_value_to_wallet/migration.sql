@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `users` MODIFY `wallet` INTEGER NOT NULL DEFAULT 0;

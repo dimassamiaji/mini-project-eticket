@@ -1,0 +1,120 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+enum Price_type {
+free
+paid
+}
+
+enum Role {
+user
+admin
+}
+
+enum Gender {
+  male
+  female
+}
+
+model users{
+  id Int @id @default(autoincrement())
+  email String @unique
+  password String
+  name String
+  gender Gender @default(male)
+  phone_number String?
+  role Role? @default(user)
+  isVerified Boolean @default(false)
+  wallet Int @default(0)
+  referral_number String @default(uuid()) @unique
+  avatar_url String?
+  created_at DateTime @default(now())
+  register_coupon Boolean @default(false)
+  transactions transactions[]
+  points points[]
+  coupons coupons[]
+  events events[]
+}
+
+model points {
+  id Int @id @default(autoincrement())
+  user_id Int
+  point Int
+  created_at DateTime
+  expired_at DateTime
+  user users @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model coupons {
+  id Int @id @default(autoincrement())
+  user_id Int
+  amount Int
+  created_at DateTime
+  expired_at DateTime
+  user users @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model events {
+  id Int @id @default(autoincrement())
+  event_name String
+  image_url String? 
+  price Decimal @db.Decimal(18,2)
+  description String
+  start_date DateTime
+  end_date DateTime
+  availability Int
+  category_id Int
+  location_id Int
+  address String
+  price_type Price_type
+  user_id Int
+  promotion promotions?
+  transactions transactions[]
+  user users @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  category categories @relation(fields: [category_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  location locations @relation(fields: [location_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model promotions {
+  event_id Int @id
+  discount Int
+  limit Int
+  start_date DateTime
+  end_date DateTime
+  event events @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model categories {
+  id Int @id @default(autoincrement())
+  category_name String
+  events events[]
+}
+model locations {
+  id Int @id @default(autoincrement())
+  location_name String
+  event events[]
+}
+
+model transactions {
+  id Int @id @default(autoincrement())
+  invoice_no Int
+  user_id Int
+  event_id Int
+  created_at DateTime
+  qty Int
+  price Decimal
+  rating Int?
+  review String?
+  user users @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  event events @relation(fields: [event_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
