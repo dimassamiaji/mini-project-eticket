@@ -17,7 +17,7 @@ function AdminEventCard(props) {
         IDR {Number(props.price).toLocaleString("id-ID")}
       </td>
       <td className="flex gap-5 justify-center items-center h-[70px] my-auto">
-        <ModalEventEditComponent {...props} />
+        <ModalEventEditComponent {...props} button="Edit" />
         <button
           className="h-[30px] border w-[72px] rounded-md text-white bg-black hover:bg-white border-black hover:text-black"
           onClick={props.hapus}

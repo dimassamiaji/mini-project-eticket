@@ -113,7 +113,7 @@ export const eventController = {
           },
         });
         const fs = require("fs");
-        if (checkImage?.image_url) {
+        if (checkImage?.image_url && req.file?.filename) {
           fs.unlinkSync(
             __dirname +
               "/../public/images/event_images/" +

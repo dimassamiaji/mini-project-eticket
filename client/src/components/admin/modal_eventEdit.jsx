@@ -11,13 +11,14 @@ import {
   Select,
 } from "@chakra-ui/react";
 import { useFormik } from "formik";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import CategoriesComponent from "./categories";
 import LocationsComponent from "./locations";
+import { EventContext } from "@/app/admin/dashboard/page";
 
 function ModalEventEditComponent(props) {
   const upload = useRef(null);
-
+  const events = useContext(EventContext);
   const initalEvent = {
     event_name: "",
     price: 0,
@@ -33,7 +34,6 @@ function ModalEventEditComponent(props) {
     location_id: 0,
     price_type: "paid",
   };
-
   const formik = useFormik({
     initialValues: initalEvent,
     onSubmit: () => {
@@ -77,15 +77,28 @@ function ModalEventEditComponent(props) {
     form.append("category_id", document.getElementById("category_id").value);
     form.append("location_id", document.getElementById("location_id").value);
     form.append("price_type", document.getElementById("price_type").value);
-
-    axiosInstance()
-      .patch("/events/" + formik.values.id, form)
-      .then(() => {
-        onClose();
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    if (formik.values.id) {
+      axiosInstance()
+        .patch("/events/" + formik.values.id, form)
+        .then(() => {
+          onClose();
+          events();
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    } else {
+      axiosInstance()
+        .post("/events/", form)
+        .then(() => {
+          onClose();
+          events();
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+    formik.resetForm();
   };
   const [categories, setCategories] = useState([]);
   const [locations, setLocations] = useState([]);
@@ -112,21 +125,23 @@ function ModalEventEditComponent(props) {
   useEffect(() => {
     fetchCategories();
     fetchLocations();
-    edit();
+    if (props.button == "Edit") {
+      edit();
+    }
   }, []);
   return (
     <>
       <button
         onClick={onOpen}
-        className="h-[30px] border w-[72px] rounded-md text-white bg-black hover:bg-white border-black hover:text-black"
+        className="h-[30px] border min-w-[72px] rounded-md text-white bg-black hover:bg-white border-black hover:text-black px-2"
       >
-        Edit
+        {props.button}
       </button>
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent w={"24rem"}>
-          <ModalHeader>Edit Event</ModalHeader>
+          <ModalHeader>{props.button}</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <div className=" py-3">
@@ -149,7 +164,7 @@ function ModalEventEditComponent(props) {
                         </td>
                       </tr>
                       <tr>
-                        <td> Event Banner</td>
+                        <td> Image</td>
                         <td>
                           <input
                             type="file"
