@@ -113,9 +113,13 @@ export const eventController = {
           },
         });
         const fs = require("fs");
-        fs.unlinkSync(
-          __dirname + "/../public/images/event_images/" + checkImage?.image_url
-        );
+        if (checkImage?.image_url) {
+          fs.unlinkSync(
+            __dirname +
+              "/../public/images/event_images/" +
+              checkImage?.image_url
+          );
+        }
         if (req.file) {
           editEvent.image_url = req.file.filename;
         }
@@ -144,9 +148,13 @@ export const eventController = {
           },
         });
         const fs = require("fs");
-        fs.unlinkSync(
-          __dirname + "/../public/images/event_images/" + checkImage?.image_url
-        );
+        if (checkImage?.image_url) {
+          fs.unlinkSync(
+            __dirname +
+              "/../public/images/event_images/" +
+              checkImage?.image_url
+          );
+        }
 
         await prisma.events.delete({
           where: {

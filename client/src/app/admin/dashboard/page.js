@@ -12,6 +12,8 @@ import { Select } from "@chakra-ui/react";
 import CategoriesComponent from "@/components/admin/categories";
 import LocationsComponent from "@/components/admin/locations";
 import Image from "next/image";
+import Swal from "sweetalert2";
+import { warning } from "framer-motion";
 
 /** @format */
 function Page() {
@@ -70,14 +72,22 @@ function Page() {
     formik.resetForm();
   };
 
-  const hapus = (id) => {
-    if (window.confirm("are you sure you want to delete" + id + "?"))
-      axiosInstance()
-        .delete("/events/" + id)
-        .then(() => {
-          fetchEvents();
-        })
-        .catch((err) => console.log(err));
+  const hapus = (id, event_name) => {
+    Swal.fire({
+      title: "are you sure you want to delete  " + event_name + " ?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axiosInstance()
+          .delete("/events/" + id)
+          .then(() => {
+            fetchEvents();
+          })
+          .catch((err) => console.log(err));
+      }
+    });
   };
 
   const fetchEvents = () => {
@@ -153,7 +163,7 @@ function Page() {
                   {...event}
                   key={key}
                   edit={() => edit(event.id)}
-                  hapus={() => hapus(event.id)}
+                  hapus={() => hapus(event.id, event.event_name)}
                 />
               ))}
             </tbody>
