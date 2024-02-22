@@ -9,14 +9,16 @@ import {
   ModalCloseButton,
   useDisclosure,
   Select,
+  useToast,
 } from "@chakra-ui/react";
 import { useFormik } from "formik";
 import { useContext, useEffect, useRef, useState } from "react";
 import CategoriesComponent from "./categories";
 import LocationsComponent from "./locations";
 import { EventContext } from "@/app/admin/dashboard/page";
-
+import moment from "moment";
 function ModalEventEditComponent(props) {
+  const toast = useToast();
   const upload = useRef(null);
   const events = useContext(EventContext);
   const initalEvent = {
@@ -51,16 +53,16 @@ function ModalEventEditComponent(props) {
     formik.setFieldValue("address", event.address);
     formik.setFieldValue(
       "start_date",
-      new Date(event.start_date)?.toISOString()?.slice(0, 10)
+      moment(event.start_date).format("YYYY-MM-DD HH:mm:ss")
     );
     formik.setFieldValue(
       "end_date",
-      new Date(event.end_date)?.toISOString()?.slice(0, 10)
+      moment(event.end_date).format("YYYY-MM-DD HH:mm:ss")
     );
     formik.setFieldValue("availability", event.availability);
     formik.setFieldValue("category_id", event.category_id);
     formik.setFieldValue("location_id", event.location_id);
-    formik.setFieldValue("price_type", event.price_type);
+    // formik.setFieldValue("price_type", event.price_type);
   };
 
   const save = () => {
@@ -76,8 +78,17 @@ function ModalEventEditComponent(props) {
     form.append("availability", formik.values.availability);
     form.append("category_id", document.getElementById("category_id").value);
     form.append("location_id", document.getElementById("location_id").value);
-    form.append("price_type", document.getElementById("price_type").value);
-    if (formik.values.id) {
+    // form.append("price_type", document.getElementById("price_type").value);
+    if (formik.values.start_date > formik.values.end_date) {
+      toast({
+        title: "Error",
+        position: "top",
+        description: "start date need to be before end date",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    } else if (formik.values.id) {
       axiosInstance()
         .patch("/events/" + formik.values.id, form)
         .then(() => {
@@ -93,12 +104,12 @@ function ModalEventEditComponent(props) {
         .then(() => {
           onClose();
           events();
+          formik.resetForm();
         })
         .catch((err) => {
           console.log(err);
         });
     }
-    formik.resetForm();
   };
   const [categories, setCategories] = useState([]);
   const [locations, setLocations] = useState([]);
@@ -126,9 +137,9 @@ function ModalEventEditComponent(props) {
     fetchCategories();
     fetchLocations();
     if (props.button == "Edit") {
-      edit();
+      edit(props.id);
     }
-  }, []);
+  }, [props.id]);
   return (
     <>
       <button
@@ -231,7 +242,7 @@ function ModalEventEditComponent(props) {
                         <td> Start Date</td>
                         <td>
                           <input
-                            type="date"
+                            type="datetime-local"
                             className="border p-1 w-full"
                             required
                             value={formik.values.start_date}
@@ -244,7 +255,7 @@ function ModalEventEditComponent(props) {
                         <td> End Date</td>
                         <td>
                           <input
-                            type="date"
+                            type="datetime-local"
                             className="border p-1 w-full"
                             required
                             value={formik.values.end_date}
@@ -292,7 +303,7 @@ function ModalEventEditComponent(props) {
                           </Select>
                         </td>
                       </tr>
-                      <tr>
+                      {/* <tr>
                         <td> Type</td>
                         <td>
                           <Select
@@ -303,7 +314,7 @@ function ModalEventEditComponent(props) {
                             <option value="free">Free</option>
                           </Select>
                         </td>
-                      </tr>
+                      </tr> */}
                     </tbody>
                   </table>
                 </div>
@@ -311,7 +322,6 @@ function ModalEventEditComponent(props) {
                   <button
                     className="bg-black text-white p-1 px-2 rounded-md w-24 "
                     type="submit"
-                    onClick={() => save()}
                   >
                     submit
                   </button>

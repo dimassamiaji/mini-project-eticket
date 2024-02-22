@@ -2,7 +2,7 @@
 
 import { Response, Request, NextFunction } from "express";
 import { prisma } from "..";
-import { Prisma } from "@prisma/client";
+import { $Enums, Prisma } from "@prisma/client";
 import { ReqUser } from "../middlewares/auth-middleware";
 import fs from "fs";
 
@@ -72,7 +72,6 @@ export const eventController = {
         category_id,
         location_id,
         address,
-        price_type,
       } = req.body;
 
       const location = await prisma.locations.findUnique({
@@ -85,6 +84,12 @@ export const eventController = {
           id: Number(category_id),
         },
       });
+      let price_type;
+      if (price == 0) {
+        price_type = $Enums.Price_type.free;
+      } else {
+        price_type = $Enums.Price_type.paid;
+      }
       const editEvent: Prisma.eventsUpdateInput = {
         event_name,
         image_url: req.file?.filename,
@@ -182,7 +187,6 @@ export const eventController = {
         category_id,
         location_id,
         address,
-        price_type,
       } = req.body;
       const location = await prisma.locations.findUnique({
         where: {
@@ -194,7 +198,12 @@ export const eventController = {
           id: Number(category_id),
         },
       });
-
+      let price_type;
+      if (price == 0) {
+        price_type = $Enums.Price_type.free;
+      } else {
+        price_type = $Enums.Price_type.paid;
+      }
       const newEvent: Prisma.eventsCreateInput = {
         event_name,
         image_url: req.file?.filename,
