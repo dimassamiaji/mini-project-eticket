@@ -62,7 +62,6 @@ function ModalEventEditComponent(props) {
     formik.setFieldValue("availability", event.availability);
     formik.setFieldValue("category_id", event.category_id);
     formik.setFieldValue("location_id", event.location_id);
-    // formik.setFieldValue("price_type", event.price_type);
   };
 
   const save = () => {
@@ -78,8 +77,7 @@ function ModalEventEditComponent(props) {
     form.append("availability", formik.values.availability);
     form.append("category_id", document.getElementById("category_id").value);
     form.append("location_id", document.getElementById("location_id").value);
-    // form.append("price_type", document.getElementById("price_type").value);
-    if (formik.values.start_date > formik.values.end_date) {
+    if (formik.values.start_date >= formik.values.end_date) {
       toast({
         title: "Error",
         position: "top",
@@ -303,18 +301,6 @@ function ModalEventEditComponent(props) {
                           </Select>
                         </td>
                       </tr>
-                      {/* <tr>
-                        <td> Type</td>
-                        <td>
-                          <Select
-                            defaultValue={formik.values.price_type}
-                            id="price_type"
-                          >
-                            <option value="paid">Paid</option>
-                            <option value="free">Free</option>
-                          </Select>
-                        </td>
-                      </tr> */}
                     </tbody>
                   </table>
                 </div>

@@ -5,11 +5,10 @@ import { createContext, useEffect, useRef, useState } from "react";
 import { NavbarAdminComponent } from "@/components/navbar";
 import Search from "@/assets/search.png";
 import { axiosInstance } from "@/axios/axios";
-import AdminEventCard from "@/components/admin/adminCard";
 import { useDebounce } from "use-debounce";
 import Image from "next/image";
 import Swal from "sweetalert2";
-import ModalEventEditComponent from "@/components/admin/modal_eventEdit";
+import AdminPromoCard from "@/components/admin/adminPromoCard";
 
 export const EventContext = createContext(null);
 /** @format */
@@ -38,7 +37,7 @@ function Page() {
 
   const fetchEvents = () => {
     axiosInstance()
-      .get("/events/", {
+      .get("/promotions/", {
         params: {
           event_name: search,
         },
@@ -59,9 +58,9 @@ function Page() {
       <EventContext.Provider value={fetchEvents}>
         <div className="w-full">
           <div className="flex flex-col justify-center  max-w-[1000px] w-full items-center m-auto  ">
-            <h1 className=" text-2xl font-bold m-4">My Event</h1>
+            <h1 className=" text-2xl font-bold m-4">Promotions</h1>
             <div className="py-5 w-full flex justify-between">
-              <div className="flex px-3 items-center gap-3  border-gray-300 border-b w-72  p-2 justify-between">
+              <div className="flex px-3 items-center gap-3  border-gray-300 border-b w-72  p-2">
                 <Image src={Search} alt="" className=" w-3 h-3" />
                 <input
                   type="text"
@@ -71,22 +70,18 @@ function Page() {
                   onChange={(e) => setSearch(e.target.value)}
                 />
               </div>
-              <div className=" md:mr-24 flex items-center">
-                <ModalEventEditComponent button="Add Event" />
-              </div>
             </div>
 
-            <table className=" w-56 md:w-full">
+            <table className="w-full">
               <thead>
                 <tr className=" text-center ">
-                  <th width="30%">IMAGE</th>
-                  <th width="40%">EVENT NAME</th>
-                  {/* <th>PRICE</th> */}
+                  <th>IMAGE</th>
+                  <th>EVENT NAME</th>
                 </tr>
               </thead>
               <tbody>
                 {events.map((event, key) => (
-                  <AdminEventCard
+                  <AdminPromoCard
                     {...event}
                     key={key}
                     edit={() => edit(event.id)}

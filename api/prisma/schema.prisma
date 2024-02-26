@@ -86,6 +86,8 @@ model events {
 
 model promotions {
   event_id Int @id
+  isReferral Boolean @default(false)
+  description String
   discount Int
   limit Int
   start_date DateTime
@@ -106,7 +108,7 @@ model locations {
 
 model transactions {
   id Int @id @default(autoincrement())
-  invoice_no Int
+  invoice_no String @default(uuid()) @unique
   user_id Int
   event_id Int
   created_at DateTime

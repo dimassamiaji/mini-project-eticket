@@ -2,6 +2,7 @@
 
 import NavbarComponent from "@/components/navbar";
 import { axiosInstanceSSR } from "@/axios/axios";
+import PromoComponent from "@/components/promo";
 
 export const metadata = {
   title: "Kickavenue - Product Detail",
@@ -9,41 +10,31 @@ export const metadata = {
 };
 
 async function Page({ params }) {
-  const { productId } = params;
+  const { event_id } = params;
 
-  const product = (await axiosInstanceSSR().get("/products/" + productId)).data
+  const event = (await axiosInstanceSSR().get("/events/" + event_id)).data
     .result;
-  console.log(product);
   return (
     <>
       <NavbarComponent />
       <div className="flex flex-col justify-center max-w-screen-2xl w-full items-center m-auto ">
-        <div className="grid max-w-screen-2xl  md:grid-cols-2 p-7 gap-3 w-full  sm:grid-cols-1">
-          <div className="m-auto">
+        <div className="grid lg:max-w-screen-2xl   md:grid-cols-2 p-7 gap-3 w-full  grid-cols-1">
+          <div className="m-auto w-full">
             <img
-              className=" max-w-[734px]  max-h-[523px]"
-              src={process.env.API_URL + product.image_url}
+              className=" lg:max-w-[734px]  lg:max-h-[523px]"
+              src={process.env.API_URL + event.image_url}
               alt=""
             />
           </div>
           <div className=" pt-10 flex flex-col gap-5  w-9/12">
-            <div className=" font-bold text-3xl">{product.product_name}</div>
+            <div className=" font-bold text-3xl">{event.event_name}</div>
             <div className="my-2">
-              <div>start from</div>
               <div className="font-bold text-3xl">
-                IDR {Number(product?.price).toLocaleString("id-ID")}
+                IDR {Number(event?.price).toLocaleString("id-ID")}
               </div>
             </div>
 
             <form action="" className="flex gap-3" id="form">
-              <input
-                className="h-[49px] border max-w-32 p-5 rounded-lg text-center"
-                type="number"
-                min={1}
-                placeholder="Quantity"
-                required
-                id="qty"
-              ></input>
               <button
                 type="submit"
                 className="h-[49px] border w-[168px] rounded-lg text-white bg-black hover:bg-white border-black hover:text-black"
@@ -51,21 +42,30 @@ async function Page({ params }) {
                 Buy
               </button>
             </form>
-            <div className="font-semibold">
-              Please Make Sure The Size Fits You
-            </div>
             <hr />
-            <div className="font-semibold">Authentic. Guarateed.</div>
-
-            <div className=" text-justify text-sm">
-              {/* Lorem ipsum dolor sit amet consectetur adipisicing elit. Rem,
-              earum architecto nisi tempore, consectetur autem porro
-              exercitationem soluta, corrupti dicta corporis similique
-              repellendus quibusdam. */}
-              {product.description ||
+            <div className=" text-justify">
+              {event.description ||
                 "We thoroughly check every purchase you make and applies our company's guarantee to the product's legitimacy. The guarantee is valid for 2 days after receiving the product from the delivery service. Should you have any concern about the product you purchase, kindly reach out to our Customer Service and Specialist on Monday - Saturday 10.00 - 21.00 (GMT+7 / WIB).\n"}
             </div>
           </div>
+          <PromoComponent
+            promo={event.promotion}
+            description={event.promotion.description}
+            isReferral={event.promotion.isReferral}
+          />
+          {event.promotion.isReferral ? (
+            <>
+              <div></div>
+              <div>
+                <label for="referral_number">Referral Number : </label>
+                <input
+                  type="text"
+                  placeholder="Referral Number"
+                  id="referral_number"
+                />
+              </div>
+            </>
+          ) : null}
         </div>
       </div>
     </>

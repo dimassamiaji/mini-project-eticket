@@ -9,7 +9,22 @@ import fs from "fs";
 export const eventController = {
   async getEvents(req: Request, res: Response, next: NextFunction) {
     try {
-      const { event_name } = req.query;
+      const { event_name, category_id, location_id } = req.query;
+      const category = {} as Prisma.categoriesWhereInput;
+      const location = {} as Prisma.locationsWhereInput;
+
+      if (Number(category_id)) {
+        category.id = Number(category_id);
+      }
+      if (Number(location_id)) {
+        location.id = Number(location_id);
+      }
+
+      const event = {
+        event_name: {
+          contains: String(event_name),
+        },
+      } as Prisma.eventsWhereInput;
       const events = await prisma.events.findMany({
         include: {
           user: {
@@ -21,9 +36,9 @@ export const eventController = {
           },
         },
         where: {
-          event_name: {
-            contains: String(event_name),
-          },
+          ...event,
+          location: { ...location },
+          category: { ...category },
         },
       });
 
@@ -46,6 +61,7 @@ export const eventController = {
               name: true,
             },
           },
+          promotion: true,
         },
         where: {
           id: Number(req.params.id),
@@ -152,6 +168,11 @@ export const eventController = {
             id: Number(req.params.id),
           },
         });
+        const checkPromo = await prisma.promotions.findUnique({
+          where: {
+            event_id: Number(req.params.id),
+          },
+        });
         const fs = require("fs");
         if (checkImage?.image_url) {
           fs.unlinkSync(
@@ -160,7 +181,13 @@ export const eventController = {
               checkImage?.image_url
           );
         }
-
+        if (checkPromo) {
+          await prisma.promotions.delete({
+            where: {
+              event_id: Number(req.params.id),
+            },
+          });
+        }
         await prisma.events.delete({
           where: {
             id: Number(req.params.id),
