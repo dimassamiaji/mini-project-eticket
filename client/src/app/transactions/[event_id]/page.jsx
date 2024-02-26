@@ -1,32 +1,60 @@
 /** @format */
+"use client";
 
 import NavbarComponent from "@/components/navbar";
-import { axiosInstanceSSR } from "@/axios/axios";
+import { axiosInstance } from "@/axios/axios";
 import PromoComponent from "@/components/promo";
 import Link from "next/link";
+import { useSelector } from "react-redux";
+import { useEffect, useState } from "react";
 
-export const metadata = {
-  title: "Atick - Event Detail",
-  description: "The best place to buy e-ticket",
-};
-
-async function Page({ params }) {
+function Page({ params }) {
+  const [event, setEvent] = useState({});
+  const [promotion, setPromo] = useState({});
   const { event_id } = params;
-
-  const event = (await axiosInstanceSSR().get("/events/" + event_id)).data
-    .result;
+  const fetchEvents = () => {
+    axiosInstance()
+      .get("/events/" + event_id)
+      .then((res) => {
+        setEvent(res.data.result);
+        if (res.data.result.promotion) setPromo(res.data.result.promotion);
+      })
+      .catch((err) => console.log(err));
+  };
+  useEffect(() => {
+    fetchEvents();
+    console.log(event.promotion);
+  }, []);
+  const userSelector = useSelector((state) => state.auth);
   return (
     <>
       <NavbarComponent />
       <div className="flex flex-col justify-center max-w-screen-2xl w-full items-center m-auto ">
-        <div className="grid lg:max-w-screen-2xl   md:grid-cols-2 p-7 gap-3 w-full  grid-cols-1">
-          <div className="m-auto w-full">
-            <img
-              className=" lg:max-w-[734px]  lg:max-h-[523px]"
-              src={process.env.API_URL + event.image_url}
-              alt=""
-            />
-          </div>
+        <h1 className=" font-bold text-3xl">Transaction Detail</h1>
+        <div className=" flex justify-center w-full">
+          <img
+            className=" lg:max-w-[734px]  lg:max-h-[523px]"
+            src={process.env.API_URL + event.image_url}
+            alt=""
+          />
+        </div>
+        <table>
+          <tbody>
+            <tr>
+              <td>Event Name</td>
+              <td>: {event.event_name}</td>
+            </tr>
+            <tr>
+              <td>Price</td>
+              <td>: IDR {Number(event.price).toLocaleString("id-ID")}</td>
+            </tr>
+            <tr>
+              <td>Wallet</td>
+              <td>: {Number(userSelector.wallet).toLocaleString("id-ID")}</td>
+            </tr>
+          </tbody>
+        </table>
+        {/* <div className="grid lg:max-w-screen-2xl md:grid-cols-2 p-7 gap-5 w-full  grid-cols-1">
           <div className=" pt-10 flex flex-col gap-5  w-9/12">
             <div className=" font-bold text-3xl">{event.event_name}</div>
             <div className="my-2">
@@ -34,7 +62,7 @@ async function Page({ params }) {
                 IDR {Number(event?.price).toLocaleString("id-ID")}
               </div>
             </div>
-            <Link href={"/transactions/" + event.id}>
+            <Link href={"/transaction/" + event.id}>
               <button
                 type="submit"
                 className="h-[49px] border w-[168px] rounded-lg text-white bg-black hover:bg-white border-black hover:text-black"
@@ -49,11 +77,11 @@ async function Page({ params }) {
             </div>
           </div>
           <PromoComponent
-            promo={event.promotion}
-            description={event.promotion.description}
-            isReferral={event.promotion.isReferral}
+            promo={promotion}
+            description={promotion.description}
+            isReferral={promotion.isReferral}
           />
-          {event.promotion.isReferral ? (
+          {promotion.isReferral ? (
             <>
               <div></div>
               <div>
@@ -66,7 +94,7 @@ async function Page({ params }) {
               </div>
             </>
           ) : null}
-        </div>
+        </div> */}
       </div>
     </>
   );

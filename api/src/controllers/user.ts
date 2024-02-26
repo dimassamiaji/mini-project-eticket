@@ -140,6 +140,7 @@ export const userController = {
         name: user.name,
         gender: user.gender,
         role: user.role,
+        wallet: user.wallet,
       };
       if (checkPassword) {
         const token = sign(resUser, secretKey, {
@@ -195,6 +196,7 @@ export const userController = {
           name: true,
           gender: true,
           role: true,
+          wallet: true,
         },
         where: {
           email: verifyUser.email,

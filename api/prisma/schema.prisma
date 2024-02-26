@@ -111,9 +111,8 @@ model transactions {
   invoice_no String @default(uuid()) @unique
   user_id Int
   event_id Int
-  created_at DateTime
-  qty Int
-  price Decimal
+  created_at DateTime @default(now())
+  price Decimal @db.Decimal(18,2)
   rating Int?
   review String?
   user users @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)

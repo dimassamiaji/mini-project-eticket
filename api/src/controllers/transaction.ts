@@ -16,8 +16,26 @@ export const transactionController = {
   },
   async addTransaction(req: ReqUser, res: Response, next: NextFunction) {
     try {
+      const { event_id, price } = req.body;
+      const newTransaction: Prisma.transactionsCreateInput = {
+        user: {
+          connect: {
+            id: req.user?.id,
+          },
+        },
+        event: {
+          connect: {
+            id: event_id,
+          },
+        },
+        price,
+      };
+      await prisma.transactions.create({
+        data: newTransaction,
+      });
       return res.send({
         success: true,
+        message: "transaction added",
       });
     } catch (error) {
       next(error);

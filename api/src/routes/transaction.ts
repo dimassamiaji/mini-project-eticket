@@ -4,3 +4,4 @@ import express, { Router } from "express";
 
 export const route: Router = express.Router();
 route.get("/", verifyUser, verifyAdmin, transactionController.getTransaction);
+route.post("/", verifyUser, transactionController.addTransaction);
