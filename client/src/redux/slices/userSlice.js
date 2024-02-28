@@ -6,6 +6,7 @@ const initialState = {
   id: 0,
   name: "",
   wallet: 0,
+  points: 0,
 };
 
 const userSlice = createSlice({

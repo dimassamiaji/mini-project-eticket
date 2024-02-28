@@ -3,15 +3,21 @@
 
 import NavbarComponent from "@/components/navbar";
 import { axiosInstance } from "@/axios/axios";
-import PromoComponent from "@/components/promo";
-import Link from "next/link";
 import { useSelector } from "react-redux";
 import { useEffect, useState } from "react";
+import { useFormik } from "formik";
+import Swal from "sweetalert2";
+import { useRouter } from "next/navigation";
+import { Select } from "@chakra-ui/react";
+import CouponsComponent from "@/components/coupons";
 
 function Page({ params }) {
+  const router = useRouter();
+  const { event_id } = params;
+  const userSelector = useSelector((state) => state.auth);
   const [event, setEvent] = useState({});
   const [promotion, setPromo] = useState({});
-  const { event_id } = params;
+  const [coupons, setCoupons] = useState([]);
   const fetchEvents = () => {
     axiosInstance()
       .get("/events/" + event_id)
@@ -21,16 +27,65 @@ function Page({ params }) {
       })
       .catch((err) => console.log(err));
   };
+  const fetchCoupons = () => {
+    axiosInstance()
+      .get("/userDetails/coupons")
+      .then((res) => {
+        setCoupons(res.data.result);
+      })
+      .catch((err) => console.log(err));
+  };
+  const initialValues = {
+    point: 0,
+    coupon: 0,
+  };
+  const formik = useFormik({
+    initialValues,
+    onSubmit: (values) => {
+      save(values);
+    },
+  });
+  const save = () => {
+    const { id, price, event_name } = event;
+    Swal.fire({
+      title: "are you sure you want to buy a ticket for  " + event_name + " ?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        axiosInstance()
+          .post("/transactions", { event_id: id, price })
+          .then((res) => {
+            Swal.fire({
+              title: "Success!",
+              text: res.data.message,
+              icon: "success",
+              timer: 2000,
+              showConfirmButton: false,
+            }).then(function () {
+              router.push("/");
+            });
+          })
+          .catch((err) => {
+            Swal.fire({
+              title: "Error!",
+              text: err.response.data.message,
+              icon: "error",
+            });
+          });
+      }
+    });
+  };
   useEffect(() => {
     fetchEvents();
-    console.log(event.promotion);
+    fetchCoupons();
   }, []);
-  const userSelector = useSelector((state) => state.auth);
   return (
     <>
       <NavbarComponent />
       <div className="flex flex-col justify-center max-w-screen-2xl w-full items-center m-auto ">
-        <h1 className=" font-bold text-3xl">Transaction Detail</h1>
+        <h1 className=" font-bold text-3xl mb-3">Transaction Detail</h1>
         <div className=" flex justify-center w-full">
           <img
             className=" lg:max-w-[734px]  lg:max-h-[523px]"
@@ -38,63 +93,75 @@ function Page({ params }) {
             alt=""
           />
         </div>
-        <table>
-          <tbody>
-            <tr>
-              <td>Event Name</td>
-              <td>: {event.event_name}</td>
-            </tr>
-            <tr>
-              <td>Price</td>
-              <td>: IDR {Number(event.price).toLocaleString("id-ID")}</td>
-            </tr>
-            <tr>
-              <td>Wallet</td>
-              <td>: {Number(userSelector.wallet).toLocaleString("id-ID")}</td>
-            </tr>
-          </tbody>
-        </table>
-        {/* <div className="grid lg:max-w-screen-2xl md:grid-cols-2 p-7 gap-5 w-full  grid-cols-1">
-          <div className=" pt-10 flex flex-col gap-5  w-9/12">
-            <div className=" font-bold text-3xl">{event.event_name}</div>
-            <div className="my-2">
-              <div className="font-bold text-3xl">
-                IDR {Number(event?.price).toLocaleString("id-ID")}
-              </div>
-            </div>
-            <Link href={"/transaction/" + event.id}>
-              <button
-                type="submit"
-                className="h-[49px] border w-[168px] rounded-lg text-white bg-black hover:bg-white border-black hover:text-black"
-              >
-                Buy
-              </button>
-            </Link>
-            <hr />
-            <div className=" text-justify">
-              {event.description ||
-                "We thoroughly check every purchase you make and applies our company's guarantee to the product's legitimacy. The guarantee is valid for 2 days after receiving the product from the delivery service. Should you have any concern about the product you purchase, kindly reach out to our Customer Service and Specialist on Monday - Saturday 10.00 - 21.00 (GMT+7 / WIB).\n"}
-            </div>
-          </div>
-          <PromoComponent
-            promo={promotion}
-            description={promotion.description}
-            isReferral={promotion.isReferral}
-          />
-          {promotion.isReferral ? (
-            <>
-              <div></div>
-              <div>
-                <label for="referral_number">Referral Number : </label>
-                <input
-                  type="text"
-                  placeholder="Referral Number"
-                  id="referral_number"
-                />
-              </div>
-            </>
-          ) : null}
-        </div> */}
+        <div className=" flex flex-col items-center justify-center mt-5">
+          <table className=" w-full font-semibold">
+            <tbody>
+              <tr>
+                <td>Event Name</td>
+                <td>: {event.event_name}</td>
+              </tr>
+              <tr>
+                <td>Price</td>
+                <td>: IDR {Number(event.price).toLocaleString("id-ID")}</td>
+              </tr>
+              {promotion.discount ? (
+                <>
+                  <tr>
+                    <td>Discount</td>
+                    <td>: {promotion.discount}%</td>
+                  </tr>
+                  <tr>
+                    <td>After Discount</td>
+                    <td>
+                      : IDR{" "}
+                      {(
+                        event.price -
+                        (event.price * promotion.discount) / 100
+                      ).toLocaleString("id-ID")}
+                    </td>
+                  </tr>
+                </>
+              ) : null}
+              <tr>
+                <td>Wallet</td>
+                <td>: {Number(userSelector.wallet).toLocaleString("id-ID")}</td>
+              </tr>
+              <tr>
+                <td>Use Coupon</td>
+                <td>
+                  <Select
+                    id="coupon_id"
+                    placeholder="Coupons"
+                    variant="outline"
+                  >
+                    {coupons.map((coupons, key) => (
+                      <CouponsComponent {...coupons} key={key} />
+                    ))}
+                  </Select>
+                </td>
+              </tr>
+              <tr>
+                <td>Use Point</td>
+                <td>
+                  <input
+                    type="number"
+                    className=" border border-slate-950 p-1 w-full"
+                    value={formik.values.point}
+                    id="point"
+                    onChange={formik.handleChange}
+                  />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <button
+            type="submit"
+            className=" bg-black text-white px-4 py-2 mt-3 rounded"
+            onClick={save}
+          >
+            Buy
+          </button>
+        </div>
       </div>
     </>
   );

@@ -18,7 +18,6 @@ export const promotionController = {
           },
           promotion: {
             select: {
-              isReferral: true,
               discount: true,
               description: true,
               start_date: true,
@@ -63,10 +62,8 @@ export const promotionController = {
   },
   async editPromo(req: Request, res: Response, next: NextFunction) {
     try {
-      const { isReferral, description, discount, limit, start_date, end_date } =
-        req.body;
+      const { description, discount, limit, start_date, end_date } = req.body;
       const editPromo: Prisma.promotionsUpdateInput = {
-        isReferral,
         description,
         discount,
         limit,
@@ -90,22 +87,14 @@ export const promotionController = {
   },
   async addPromo(req: ReqUser, res: Response, next: NextFunction) {
     try {
-      const {
-        id,
-        isReferral,
-        description,
-        discount,
-        limit,
-        start_date,
-        end_date,
-      } = req.body;
+      const { id, description, discount, limit, start_date, end_date } =
+        req.body;
       const newPromo: Prisma.promotionsCreateInput = {
         event: {
           connect: {
             id,
           },
         },
-        isReferral,
         description,
         discount,
         limit,

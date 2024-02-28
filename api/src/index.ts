@@ -27,6 +27,7 @@ app.use("/events", routes.eventRoutes);
 app.use("/ecl", routes.eventCatLoc);
 app.use("/promotions", routes.promotionRoutes);
 app.use("/transactions", routes.transactionRoutes);
+app.use("/userDetails", routes.userDetailsRoutes);
 
 app.use((error: Error, req: Request, res: Response, next: NextFunction) => {
   res.status(500).send({ message: error.message || "internal server error" });

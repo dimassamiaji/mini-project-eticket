@@ -48,12 +48,15 @@ async function Page({ params }) {
                 "We thoroughly check every purchase you make and applies our company's guarantee to the product's legitimacy. The guarantee is valid for 2 days after receiving the product from the delivery service. Should you have any concern about the product you purchase, kindly reach out to our Customer Service and Specialist on Monday - Saturday 10.00 - 21.00 (GMT+7 / WIB).\n"}
             </div>
           </div>
-          <PromoComponent
-            promo={event.promotion}
-            description={event.promotion.description}
-            isReferral={event.promotion.isReferral}
-          />
-          {event.promotion.isReferral ? (
+          {event.promotion ? (
+            <PromoComponent
+              promo={event.promotion}
+              description={event.promotion.description}
+              // isReferral={event.promotion.isReferral}
+            />
+          ) : null}
+
+          {/* {event.promotion.isReferral ? (
             <>
               <div></div>
               <div>
@@ -65,7 +68,7 @@ async function Page({ params }) {
                 />
               </div>
             </>
-          ) : null}
+          ) : null} */}
         </div>
       </div>
     </>

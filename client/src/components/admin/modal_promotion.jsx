@@ -20,7 +20,6 @@ function ModalPromotion(props) {
   const events = useContext(EventContext);
   const initalPromo = {
     id: 0,
-    isReferral: false,
     description: "",
     start_date: "",
     end_date: "",
@@ -39,7 +38,6 @@ function ModalPromotion(props) {
     const promo = res.data.result;
     if (promo) {
       formik.setFieldValue("id", promo.id);
-      formik.setFieldValue("isReferral", promo.isReferral);
       formik.setFieldValue("description", promo.description);
       formik.setFieldValue("limit", promo.limit);
       formik.setFieldValue("discount", promo.discount);
@@ -54,15 +52,7 @@ function ModalPromotion(props) {
     }
   };
   const save = (values) => {
-    const {
-      id,
-      isReferral,
-      description,
-      limit,
-      discount,
-      start_date,
-      end_date,
-    } = values;
+    const { id, description, limit, discount, start_date, end_date } = values;
     if (formik.values.start_date >= formik.values.end_date) {
       toast({
         title: "Error",
@@ -75,7 +65,6 @@ function ModalPromotion(props) {
     } else if (props.id) {
       axiosInstance()
         .patch("/promotions/" + props.id, {
-          isReferral,
           description,
           limit,
           discount,
@@ -93,7 +82,6 @@ function ModalPromotion(props) {
       axiosInstance()
         .post("/promotions/", {
           id: props.id,
-          isReferral,
           description,
           limit,
           discount,
@@ -132,18 +120,6 @@ function ModalPromotion(props) {
                 <div className="flex flex-col gap-1 ">
                   <table>
                     <tbody>
-                      <tr>
-                        <td> Type</td>
-                        <td>
-                          <Select
-                            defaultValue={formik.values.isReferral}
-                            id="isReferral"
-                          >
-                            <option value={false}>Non-Referral</option>
-                            <option value={true}>Referral</option>
-                          </Select>
-                        </td>
-                      </tr>
                       <tr>
                         <td> Description</td>
                         <td>

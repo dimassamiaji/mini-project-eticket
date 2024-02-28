@@ -152,7 +152,7 @@ function RegisterComponent() {
           </div>
         </FormControl>
         <div>
-          Have account ?{" "}
+          Have an account ?{" "}
           <Link href="/auth/login" className="text-[#4F46E5] font-bold">
             Login
           </Link>

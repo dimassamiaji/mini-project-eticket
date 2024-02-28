@@ -39,19 +39,11 @@ model users{
   avatar_url String?
   created_at DateTime @default(now())
   register_coupon Boolean @default(false)
+  points Int @default(0)
+  expired_at DateTime?
   transactions transactions[]
-  points points[]
   coupons coupons[]
   events events[]
-}
-
-model points {
-  id Int @id @default(autoincrement())
-  user_id Int
-  point Int
-  created_at DateTime
-  expired_at DateTime
-  user users @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 
 model coupons {
@@ -86,7 +78,6 @@ model events {
 
 model promotions {
   event_id Int @id
-  isReferral Boolean @default(false)
   description String
   discount Int
   limit Int

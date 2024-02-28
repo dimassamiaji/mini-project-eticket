@@ -19,12 +19,13 @@ class Route {
 }
 
 const routes = [];
-routes.push(new Route("/"));
+// routes.push(new Route("/"));
 routes.push(new Route("/auth/login", guestOnly));
 routes.push(new Route("/auth/register", guestOnly));
 routes.push(new Route("/auth/forget-password", guestOnly));
 routes.push(new Route("/admin/dashboard", adminOnly));
 routes.push(new Route("/admin/promotion", adminOnly));
+routes.push(new Route("/transactions", needLogin));
 
 export default function ProtectedPage({ children }) {
   const userSelector = useSelector((state) => state.auth);
@@ -32,7 +33,7 @@ export default function ProtectedPage({ children }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const checkRoute = routes.find((route) => route.path == pathname);
+    const checkRoute = routes.find((route) => pathname.includes(route.path));
     if (checkRoute?.type == adminOnly && userSelector.role != "admin")
       return redirect("/auth/login");
     else if (checkRoute?.type == needLogin && !userSelector.email)
@@ -43,7 +44,7 @@ export default function ProtectedPage({ children }) {
       setTimeout(() => {
         setIsLoading(false);
       }, 500);
-  }, [children, userSelector.id]);
+  }, [children, userSelector.id, pathname]);
 
   return <div>{isLoading ? <LoadingPage /> : children}</div>;
 }

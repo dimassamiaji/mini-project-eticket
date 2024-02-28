@@ -63,22 +63,19 @@ export const userController = {
           }
           nextDate.setMonth(nextMonth);
           nextDate.setFullYear(nextYear);
-          const pointIncrease: Prisma.pointsCreateInput = {
-            point: 10000,
-            created_at: currentDate,
+          const pointIncrease: Prisma.usersUpdateInput = {
+            points: checkRefNum.points + 10000,
             expired_at: new Date(nextDate),
-            user: {
-              connect: {
-                id: checkRefNum.id,
-              },
-            },
           };
-          await prisma.points.create({
-            data: pointIncrease,
-          });
 
           await prisma.users.create({
             data: newUser,
+          });
+          await prisma.users.update({
+            data: pointIncrease,
+            where: {
+              id: checkRefNum.id,
+            },
           });
           const getCoupon: Prisma.usersUpdateInput = {
             register_coupon: true,
@@ -141,6 +138,7 @@ export const userController = {
         gender: user.gender,
         role: user.role,
         wallet: user.wallet,
+        points: user.points,
       };
       if (checkPassword) {
         const token = sign(resUser, secretKey, {
@@ -197,6 +195,7 @@ export const userController = {
           gender: true,
           role: true,
           wallet: true,
+          points: true,
         },
         where: {
           email: verifyUser.email,

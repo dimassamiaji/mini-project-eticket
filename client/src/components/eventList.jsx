@@ -62,15 +62,17 @@ function EventListComponent() {
   return (
     <div className="w-full">
       <div className=" mt-5 px-7 max-w-screen-2xl  w-full">
-        <div className="flex px-3 items-center justify-center gap-3  border-gray-300 border-b   p-2">
-          <Image src={Search} alt="" className=" w-3 h-3" />
-          <input
-            type="text"
-            placeholder="Type any events here"
-            className=" outline-none             "
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
+        <div className="flex flex-col lg:flex-row px-3 items-center justify-center gap-3  border-gray-300 border-b   p-2">
+          <div className="flex gap-3 items-center justify-center">
+            <Image src={Search} alt="" className=" w-3 h-3" />
+            <input
+              type="text"
+              placeholder="Type any events here"
+              className=" outline-none             "
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
           <Select
             placeholder="Category"
             id="category_id"
