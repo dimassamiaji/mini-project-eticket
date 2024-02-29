@@ -16,52 +16,8 @@ export const transactionController = {
   },
   async addTransaction(req: ReqUser, res: Response, next: NextFunction) {
     try {
-      const { event_id, point, coupon_id } = req.body;
+      const { event_id, point, coupon_id, availability } = req.body;
       let { price } = req.body;
-      const checkPromo = await prisma.promotions.findUnique({
-        where: {
-          event_id,
-          end_date: { gte: new Date() },
-          limit: { gte: 0 },
-        },
-      });
-      if (checkPromo) {
-        price = Number(price) - Number((price * checkPromo.discount) / 100);
-        const limitDecrease: Prisma.promotionsUpdateInput = {
-          limit: checkPromo.limit - 1,
-        };
-        await prisma.promotions.update({
-          data: limitDecrease,
-          where: { event_id: checkPromo.event_id },
-        });
-      }
-      if (coupon_id) {
-        const coupon = await prisma.coupons.findUnique({
-          where: { id: Number(coupon_id) },
-        });
-
-        price = price - Number((price * Number(coupon?.amount)) / 100);
-        await prisma.coupons.delete({
-          where: { id: Number(coupon_id) },
-        });
-      }
-      if (point) {
-        if (Number(req.user?.points) < point)
-          throw Error("insufficient points");
-        price = price - Number(point);
-        const pointDecrease: Prisma.usersUpdateInput = {
-          points: Number(req.user?.points) - Number(point),
-        };
-        await prisma.users.update({
-          data: pointDecrease,
-          where: {
-            id: req.user?.id,
-          },
-        });
-      }
-      if (Number(req.user?.wallet) < price) {
-        throw Error("insufficient wallet balance");
-      }
       const checkUser = await prisma.transactions.findMany({
         where: {
           user: {
@@ -73,28 +29,81 @@ export const transactionController = {
         },
       });
       if (checkUser.length > 0) throw Error("you already purchased this item");
-      const newTransaction: Prisma.transactionsCreateInput = {
-        user: {
-          connect: {
-            id: req.user?.id,
+      await prisma.$transaction(async (prisma) => {
+        const checkPromo = await prisma.promotions.findUnique({
+          where: {
+            event_id,
+            end_date: { gte: new Date() },
+            limit: { gte: 0 },
           },
-        },
-        event: {
-          connect: {
-            id: event_id,
+        });
+        if (checkPromo) {
+          price = Number(price) - Number((price * checkPromo.discount) / 100);
+          const limitDecrease: Prisma.promotionsUpdateInput = {
+            limit: checkPromo.limit - 1,
+          };
+          await prisma.promotions.update({
+            data: limitDecrease,
+            where: { event_id: checkPromo.event_id },
+          });
+        }
+        if (coupon_id) {
+          const coupon = await prisma.coupons.findUnique({
+            where: { id: Number(coupon_id) },
+          });
+
+          price = price - Number((price * Number(coupon?.amount)) / 100);
+          await prisma.coupons.delete({
+            where: { id: Number(coupon_id) },
+          });
+        }
+        if (point) {
+          if (Number(req.user?.points) < point)
+            throw Error("insufficient points");
+          price = price - Number(point);
+          const pointDecrease: Prisma.usersUpdateInput = {
+            points: Number(req.user?.points) - Number(point),
+          };
+          await prisma.users.update({
+            data: pointDecrease,
+            where: {
+              id: req.user?.id,
+            },
+          });
+        }
+        if (Number(req.user?.wallet) < price) {
+          throw Error("insufficient wallet balance");
+        }
+        const newTransaction: Prisma.transactionsCreateInput = {
+          user: {
+            connect: {
+              id: req.user?.id,
+            },
           },
-        },
-        price,
-      };
-      await prisma.transactions.create({
-        data: newTransaction,
-      });
-      const walletDecrease: Prisma.usersUpdateInput = {
-        wallet: Number(req.user?.wallet) - price,
-      };
-      await prisma.users.update({
-        data: walletDecrease,
-        where: { id: req.user?.id },
+          event: {
+            connect: {
+              id: event_id,
+            },
+          },
+          price,
+        };
+        await prisma.transactions.create({
+          data: newTransaction,
+        });
+        const walletDecrease: Prisma.usersUpdateInput = {
+          wallet: Number(req.user?.wallet) - price,
+        };
+        const availabilityDecrease: Prisma.eventsUpdateInput = {
+          availability: availability - 1,
+        };
+        await prisma.users.update({
+          data: walletDecrease,
+          where: { id: req.user?.id },
+        });
+        await prisma.events.update({
+          data: availabilityDecrease,
+          where: { id: event_id },
+        });
       });
       return res.send({
         success: true,

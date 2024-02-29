@@ -10,7 +10,7 @@ import Swal from "sweetalert2";
 import { useRouter } from "next/navigation";
 import { Select } from "@chakra-ui/react";
 import CouponsComponent from "@/components/coupons";
-
+import moment from "moment";
 function Page({ params }) {
   const router = useRouter();
   const { event_id } = params;
@@ -45,8 +45,9 @@ function Page({ params }) {
       save(values);
     },
   });
-  const save = () => {
-    const { id, price, event_name } = event;
+  const save = (values) => {
+    const { id, price, event_name, availability } = event;
+    const { point, coupon_id } = values;
     Swal.fire({
       title: "are you sure you want to buy a ticket for  " + event_name + " ?",
       icon: "warning",
@@ -55,7 +56,13 @@ function Page({ params }) {
     }).then((result) => {
       if (result.isConfirmed) {
         axiosInstance()
-          .post("/transactions", { event_id: id, price })
+          .post("/transactions", {
+            event_id: id,
+            price,
+            point,
+            coupon_id,
+            availability,
+          })
           .then((res) => {
             Swal.fire({
               title: "Success!",
@@ -93,75 +100,88 @@ function Page({ params }) {
             alt=""
           />
         </div>
-        <div className=" flex flex-col items-center justify-center mt-5">
-          <table className=" w-full font-semibold">
-            <tbody>
-              <tr>
-                <td>Event Name</td>
-                <td>: {event.event_name}</td>
-              </tr>
-              <tr>
-                <td>Price</td>
-                <td>: IDR {Number(event.price).toLocaleString("id-ID")}</td>
-              </tr>
-              {promotion.discount ? (
-                <>
-                  <tr>
-                    <td>Discount</td>
-                    <td>: {promotion.discount}%</td>
-                  </tr>
-                  <tr>
-                    <td>After Discount</td>
-                    <td>
-                      : IDR{" "}
-                      {(
-                        event.price -
-                        (event.price * promotion.discount) / 100
-                      ).toLocaleString("id-ID")}
-                    </td>
-                  </tr>
-                </>
-              ) : null}
-              <tr>
-                <td>Wallet</td>
-                <td>: {Number(userSelector.wallet).toLocaleString("id-ID")}</td>
-              </tr>
-              <tr>
-                <td>Use Coupon</td>
-                <td>
-                  <Select
-                    id="coupon_id"
-                    placeholder="Coupons"
-                    variant="outline"
-                  >
-                    {coupons.map((coupons, key) => (
-                      <CouponsComponent {...coupons} key={key} />
-                    ))}
-                  </Select>
-                </td>
-              </tr>
-              <tr>
-                <td>Use Point</td>
-                <td>
-                  <input
-                    type="number"
-                    className=" border border-slate-950 p-1 w-full"
-                    value={formik.values.point}
-                    id="point"
-                    onChange={formik.handleChange}
-                  />
-                </td>
-              </tr>
-            </tbody>
-          </table>
-          <button
-            type="submit"
-            className=" bg-black text-white px-4 py-2 mt-3 rounded"
-            onClick={save}
-          >
-            Buy
-          </button>
-        </div>
+        <form id="form" action="" onSubmit={formik.handleSubmit}>
+          <div className=" flex flex-col items-center justify-center mt-5">
+            <table className=" w-full font-semibold">
+              <tbody>
+                <tr>
+                  <td>Event Name</td>
+                  <td>: {event.event_name}</td>
+                </tr>
+                <tr>
+                  <td>Price</td>
+                  <td>: IDR {Number(event.price).toLocaleString("id-ID")}</td>
+                </tr>
+                {promotion.discount ? (
+                  <>
+                    <tr>
+                      <td>Discount</td>
+                      <td>: {promotion.discount}%</td>
+                    </tr>
+                    <tr>
+                      <td>After Discount</td>
+                      <td>
+                        : IDR{" "}
+                        {(
+                          event.price -
+                          (event.price * promotion.discount) / 100
+                        ).toLocaleString("id-ID")}
+                      </td>
+                    </tr>
+                  </>
+                ) : null}
+                <tr>
+                  <td>Wallet</td>
+                  <td>
+                    : {Number(userSelector.wallet).toLocaleString("id-ID")}
+                  </td>
+                </tr>
+                <tr>
+                  <td>Use Coupon</td>
+                  <td>
+                    <Select
+                      id="coupon_id"
+                      placeholder="Coupons"
+                      variant="outline"
+                      onChange={formik.handleChange}
+                    >
+                      {coupons.map((coupons, key) => (
+                        <CouponsComponent {...coupons} key={key} />
+                      ))}
+                    </Select>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Points</td>
+                  <td>
+                    {userSelector.points.toLocaleString("id-ID")}, exp:
+                    {userSelector.points
+                      ? moment(userSelector.expired_at).format("YYYY-MM-DD")
+                      : "-"}
+                  </td>
+                </tr>
+                <tr>
+                  <td>Use Points</td>
+                  <td>
+                    <input
+                      type="number"
+                      className=" border border-slate-950 p-1 w-full"
+                      value={formik.values.point}
+                      id="point"
+                      onChange={formik.handleChange}
+                    />
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <button
+              type="submit"
+              className=" bg-black text-white px-4 py-2 my-3 rounded"
+            >
+              Buy
+            </button>
+          </div>
+        </form>
       </div>
     </>
   );

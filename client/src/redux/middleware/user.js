@@ -10,7 +10,6 @@ export const userLogin = ({ email, password }) => {
       const res = await axiosInstance().get("/users", {
         params: { email, password },
       });
-      // console.log(res.data.result);
       if (res.data.result?.id) {
         const { name } = res.data.result;
 
@@ -19,7 +18,8 @@ export const userLogin = ({ email, password }) => {
           icon: "success",
           timer: 2000,
           showConfirmButton: false,
-        }).then(function () {
+        }).then(async function () {
+          await axiosInstance().patch("userDetails/v1");
           dispatch(functionLogin(res.data.result));
         });
 
@@ -51,6 +51,7 @@ export const keepLogin = () => {
       });
 
       if (res.data.result?.id) {
+        await axiosInstance().patch("userDetails/v1");
         dispatch(functionLogin(res.data.result));
 
         localStorage.setItem("user", res.data.token);

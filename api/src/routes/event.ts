@@ -5,7 +5,7 @@ import { eventController } from "../controllers/event";
 import { verifyAdmin, verifyUser } from "../middlewares/auth-middleware";
 import { fileUploader } from "../middlewares/multer";
 export const route: Router = express.Router();
-route.get("/", eventController.getEvents);
+route.get("/page/:id", eventController.getEvents);
 route.get("/:id", eventController.getEventById);
 route.patch(
   "/:id",

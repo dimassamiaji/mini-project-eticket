@@ -9,10 +9,9 @@ import { Providers } from "../components/chakra-provider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "KickAvenue",
-  description: "Kickavenue",
+  title: "Atick",
+  description: "The best place to buy e-ticket",
 };
-
 export default function RootLayout({ children }) {
   return (
     <StoreProvider>

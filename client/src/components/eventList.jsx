@@ -11,6 +11,8 @@ import { useDebounce } from "use-debounce";
 import { Select } from "@chakra-ui/react";
 import CategoriesComponent from "./admin/categories";
 import LocationsComponent from "./admin/locations";
+import { Pagination } from "@mui/material";
+import { ThemeProvider, createTheme } from "@mui/material";
 function EventListComponent() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState(0);
@@ -19,10 +21,16 @@ function EventListComponent() {
   const [value] = useDebounce(search, 500);
   const [categories, setCategories] = useState([]);
   const [locations, setLocations] = useState([]);
+  const [pageCount, setPageCount] = useState(0);
+  const [page, setPage] = useState(1);
 
+  const theme = createTheme();
+  const handleChange = (event, value) => {
+    setPage(value);
+  };
   const fetchEvents = () => {
     axiosInstance()
-      .get("/events/", {
+      .get("/events/page/" + page, {
         params: {
           event_name: search,
           category_id: category,
@@ -31,6 +39,7 @@ function EventListComponent() {
       })
       .then((res) => {
         setEvents(res.data.result);
+        setPageCount(res.data.pageCount);
       })
       .catch((err) => console.log(err));
   };
@@ -54,7 +63,7 @@ function EventListComponent() {
     fetchEvents();
     fetchCategories();
     fetchLocations();
-  }, [value, category, location]);
+  }, [value, category, location, page]);
 
   const ps = useMemo(() => [...events].sort((a, b) => a.id - b.id), [events]);
   // const ps = [...events].sort((a, b) => a.price - b.price);
@@ -95,11 +104,20 @@ function EventListComponent() {
           </Select>
         </div>
       </div>
-      <div className="grid max-w-screen-2xl w-full grid-cols-1 md:grid-cols-3 p-7 gap-3 justify-items-center">
+      <div className="grid max-w-screen-2xl w-full grid-cols-1 lg:grid-cols-4 p-7 gap-3 justify-items-center">
         {ps?.map((event, key) => (
           <EventCard {...event} key={key} />
         ))}
       </div>
+      <ThemeProvider theme={theme}>
+        <Pagination
+          count={pageCount}
+          page={page}
+          color="primary"
+          className=" flex justify-center mb-4"
+          onChange={handleChange}
+        />
+      </ThemeProvider>
     </div>
   );
 }

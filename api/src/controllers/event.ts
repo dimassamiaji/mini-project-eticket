@@ -12,20 +12,22 @@ export const eventController = {
       const { event_name, category_id, location_id } = req.query;
       const category = {} as Prisma.categoriesWhereInput;
       const location = {} as Prisma.locationsWhereInput;
-
+      const take = 8;
+      const skip = (Number(req.params.id) - 1) * take;
       if (Number(category_id)) {
         category.id = Number(category_id);
       }
       if (Number(location_id)) {
         location.id = Number(location_id);
       }
-
       const event = {
         event_name: {
           contains: String(event_name),
         },
       } as Prisma.eventsWhereInput;
       const events = await prisma.events.findMany({
+        skip,
+        take,
         include: {
           user: {
             select: {
@@ -39,12 +41,31 @@ export const eventController = {
           ...event,
           location: { ...location },
           category: { ...category },
+          availability: { gt: 0 },
         },
       });
-
+      const eventsAll = await prisma.events.findMany({
+        include: {
+          user: {
+            select: {
+              id: true,
+              email: true,
+              name: true,
+            },
+          },
+        },
+        where: {
+          ...event,
+          location: { ...location },
+          category: { ...category },
+          availability: { gt: 0 },
+        },
+      });
+      const pageCount = Math.ceil(eventsAll.length / take);
       res.send({
         success: true,
         result: events,
+        pageCount,
       });
     } catch (error) {
       next(error);

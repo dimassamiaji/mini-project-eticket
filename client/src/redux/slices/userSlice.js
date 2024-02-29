@@ -7,6 +7,7 @@ const initialState = {
   name: "",
   wallet: 0,
   points: 0,
+  expired_at: "",
 };
 
 const userSlice = createSlice({

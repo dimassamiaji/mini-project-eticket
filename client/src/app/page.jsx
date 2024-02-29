@@ -5,8 +5,8 @@ import EventListComponent from "@/components/eventList";
 import SliderComponent from "@/components/slider";
 
 export const metadata = {
-  title: "Kickavenue - Home",
-  description: "tempat jualan sepatu",
+  title: "Atick - Home",
+  description: "The best place to buy e-ticket",
 };
 
 export default function Home() {

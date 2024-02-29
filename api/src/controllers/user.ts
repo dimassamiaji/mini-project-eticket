@@ -139,6 +139,7 @@ export const userController = {
         role: user.role,
         wallet: user.wallet,
         points: user.points,
+        expired_at: user.expired_at,
       };
       if (checkPassword) {
         const token = sign(resUser, secretKey, {
@@ -196,6 +197,7 @@ export const userController = {
           role: true,
           wallet: true,
           points: true,
+          expired_at: true,
         },
         where: {
           email: verifyUser.email,
