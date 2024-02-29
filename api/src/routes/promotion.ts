@@ -10,4 +10,4 @@ route.get("/", promotionController.getPromo);
 route.get("/:id", promotionController.getPromoById);
 route.patch("/:id", verifyUser, verifyAdmin, promotionController.editPromo);
 route.post("/", verifyUser, verifyAdmin, promotionController.addPromo);
-route.delete("/:id", verifyUser, verifyAdmin, eventController.deleteEvent);
+route.delete("/:id", verifyUser, verifyAdmin, promotionController.deletePromo);

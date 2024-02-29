@@ -19,14 +19,14 @@ function Page() {
 
   const hapus = (id, event_name) => {
     Swal.fire({
-      title: "are you sure you want to delete  " + event_name + " ?",
+      title: "are you sure you want to delete  " + event_name + " promotion ?",
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Yes",
     }).then((result) => {
       if (result.isConfirmed) {
         axiosInstance()
-          .delete("/events/" + id)
+          .delete("/promotions/" + id)
           .then(() => {
             fetchEvents();
           })

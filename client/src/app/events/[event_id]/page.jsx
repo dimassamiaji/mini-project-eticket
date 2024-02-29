@@ -6,7 +6,7 @@ import PromoComponent from "@/components/promo";
 import Link from "next/link";
 
 export const metadata = {
-  title: "Atick - Event Detail",
+  title: "Etix - Event Detail",
   description: "The best place to buy e-ticket",
 };
 

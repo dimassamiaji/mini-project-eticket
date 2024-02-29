@@ -5,10 +5,66 @@ import { ReqUser } from "../middlewares/auth-middleware";
 export const transactionController = {
   async getTransaction(req: Request, res: Response, next: NextFunction) {
     try {
-      const transactions = await prisma.transactions.findMany();
+      const { invoice_no } = req.query;
+      const transaction = {
+        invoice_no: {
+          contains: String(invoice_no),
+        },
+      } as Prisma.transactionsWhereInput;
+      const transactions = await prisma.transactions.findMany({
+        include: {
+          user: {
+            select: {
+              email: true,
+            },
+          },
+          event: { select: { event_name: true } },
+        },
+        where: { ...transaction },
+      });
       return res.send({
         success: true,
         result: transactions,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+  async getTransactionUser(req: ReqUser, res: Response, next: NextFunction) {
+    try {
+      const { invoice_no } = req.query;
+      const transaction = {
+        invoice_no: {
+          contains: String(invoice_no),
+        },
+      } as Prisma.transactionsWhereInput;
+      const transactions = await prisma.transactions.findMany({
+        include: {
+          event: { select: { event_name: true } },
+        },
+        where: { ...transaction, user_id: req.user?.id },
+      });
+      return res.send({
+        success: true,
+        result: transactions,
+      });
+    } catch (error) {
+      next(error);
+    }
+  },
+  async editReview(req: ReqUser, res: Response, next: NextFunction) {
+    try {
+      const { invoice_no, rating, review } = req.body;
+      const editReview: Prisma.transactionsUpdateInput = {
+        rating,
+        review,
+      };
+      await prisma.transactions.update({
+        data: editReview,
+        where: { invoice_no },
+      });
+      return res.send({
+        success: true,
       });
     } catch (error) {
       next(error);
@@ -61,6 +117,8 @@ export const transactionController = {
           if (Number(req.user?.points) < point)
             throw Error("insufficient points");
           price = price - Number(point);
+          if (price < 0)
+            throw Error("points spent cannot be higher than the final price");
           const pointDecrease: Prisma.usersUpdateInput = {
             points: Number(req.user?.points) - Number(point),
           };

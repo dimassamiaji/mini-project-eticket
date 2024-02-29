@@ -7,6 +7,7 @@ import { functionLogout } from "../redux/slices/userSlice";
 import UserIcon from "../assets/user.svg";
 import Link from "next/link";
 import Image from "next/image";
+import Logo from "../assets/logo.png";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 function NavbarComponent() {
   const userSelector = useSelector((state) => state.auth);
@@ -21,25 +22,16 @@ function NavbarComponent() {
     >
       {/* logo */}
       <Link className="font-bold text-xl" href={"/"}>
-        BrandName
+        <Image className=" w-20" src={Logo} alt="" />
       </Link>
 
       {/* menus */}
-      <div className="flex gap-4 text-sm font-semibold text-[#737373] items-center">
-        <Link href="/">Home</Link>
-        <Link href={"/"}>Shop</Link>
-        <Link href={"/"}>About</Link>
-        <Link href={"/"}>Blog</Link>
-        <Link href={"/"}>Contact</Link>
-      </div>
+      <div className="flex gap-4 text-sm font-semibold text-[#737373] items-center"></div>
 
       {/* login and register */}
       {userSelector?.id ? (
         <div className="flex gap-3">
-          <div className="flex items-center cursor-pointer">
-            <FiShoppingCart />
-          </div>
-          <div>Welcome, {userSelector?.name}</div>
+          <div>{userSelector?.name}</div>
           <button
             className="rounded-md border-gray-500 border  px-2"
             onClick={logout}
@@ -83,10 +75,7 @@ export function NavbarAdminComponent() {
         {/* login and register */}
         {userSelector?.id ? (
           <div className="flex gap-3">
-            <div>
-              Welcome,
-              {userSelector?.name}
-            </div>
+            <div>{userSelector?.name}</div>
             <button
               className="rounded-md border-gray-500 border  px-2"
               onClick={logout}

@@ -33,7 +33,6 @@ function ModalPromotion(props) {
     },
   });
   const edit = async (id) => {
-    console.log(props.id);
     const res = await axiosInstance().get("/promotions/" + props.id);
     const promo = res.data.result;
     if (promo) {

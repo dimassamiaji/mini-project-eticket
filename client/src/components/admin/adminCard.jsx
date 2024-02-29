@@ -11,7 +11,7 @@ function AdminEventCard(props) {
           <img
             src={process.env.API_URL + props.image_url}
             alt=""
-            className=" w-24 object-cover max-h-[70px]"
+            className=" w-24 object-cover max-h-[70px] m-auto"
           />
         </td>
         <td className="text-center">{props.event_name}</td>

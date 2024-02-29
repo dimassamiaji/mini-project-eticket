@@ -5,7 +5,7 @@ import EventListComponent from "@/components/eventList";
 import SliderComponent from "@/components/slider";
 
 export const metadata = {
-  title: "Atick - Home",
+  title: "Etix - Home",
   description: "The best place to buy e-ticket",
 };
 
