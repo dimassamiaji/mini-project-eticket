@@ -2,7 +2,7 @@
 "use client";
 import { createContext, useEffect, useRef, useState } from "react";
 
-import { NavbarAdminComponent } from "@/components/navbar";
+import NavbarComponent, { NavbarAdminComponent } from "@/components/navbar";
 import Search from "@/assets/search.png";
 import { axiosInstance } from "@/axios/axios";
 import { useDebounce } from "use-debounce";
@@ -43,7 +43,7 @@ function Page() {
   }, [value]);
   return (
     <>
-      <NavbarAdminComponent />
+      <NavbarComponent />
       <TransactionContext.Provider value={fetchTransactions}>
         <div className="w-full">
           <div className="flex flex-col justify-center  max-w-[1000px] w-full items-center m-auto  ">

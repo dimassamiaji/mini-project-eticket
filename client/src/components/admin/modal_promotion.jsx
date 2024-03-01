@@ -50,7 +50,8 @@ function ModalPromotion(props) {
       );
     }
   };
-  const save = (values) => {
+  const save = async (values) => {
+    const res = await axiosInstance().get("/promotions/" + props.id);
     const { id, description, limit, discount, start_date, end_date } = values;
     if (formik.values.start_date >= formik.values.end_date) {
       toast({
@@ -61,7 +62,7 @@ function ModalPromotion(props) {
         duration: 3000,
         isClosable: true,
       });
-    } else if (props.id) {
+    } else if (res.data.result) {
       axiosInstance()
         .patch("/promotions/" + props.id, {
           description,

@@ -20,7 +20,6 @@ function ModalTransactionUser(props) {
   const transactions = useContext(TransactionContext);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const initalReview = {
-    invoice_no: "",
     rating: 0,
     review: "",
   };
@@ -37,9 +36,10 @@ function ModalTransactionUser(props) {
       },
     });
     const transaction = res.data.result;
+    console.log(transaction);
     if (transaction) {
-      formik.setFieldValue("rating", transaction.rating);
-      formik.setFieldValue("review", transaction.review);
+      formik.setFieldValue("rating", transaction[0].rating);
+      formik.setFieldValue("review", transaction[0].review);
     }
   };
   const save = (values) => {
@@ -113,7 +113,6 @@ function ModalTransactionUser(props) {
                         <td>
                           <textarea
                             type="text"
-                            placeholder="Review"
                             className="border p-1 w-full"
                             value={formik.values.review}
                             id="review"

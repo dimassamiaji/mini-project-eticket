@@ -25,7 +25,9 @@ routes.push(new Route("/auth/register", guestOnly));
 routes.push(new Route("/auth/forget-password", guestOnly));
 routes.push(new Route("/admin/dashboard", adminOnly));
 routes.push(new Route("/admin/promotion", adminOnly));
+routes.push(new Route("/admin/transaction", adminOnly));
 routes.push(new Route("/transactions", needLogin));
+routes.push(new Route("/history", needLogin));
 
 export default function ProtectedPage({ children }) {
   const userSelector = useSelector((state) => state.auth);
